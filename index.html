@@ -60,7 +60,6 @@
 					</ul>
 					<ul class="list-group" ng-show="boardsCtrl.currentSubject !== -1" ng-controller="resourceController as resCtrl">
 						<li class="list-group-item" ng-repeat="resource in resCtrl.getResources(subjectCtrl.subjects[boardsCtrl.currentSubject].resources)">
-							<!--<img src="{{resource.thumbnail}}" alt="thumb_{{resource.name}}">-->
 							<a href="{{resource.url}}" ng-class="{deadLink:!resource.active}">{{resource.name}}</a>
 						</li>
 					</ul>
