@@ -1,0 +1,79 @@
+<!DOCTYPE Html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title>Admin Panel</title>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="styles/style.css">
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	</head>
+	<body ng-app="course" ng-controller="boardController as boardsCtrl">
+		<div class="navbar navbar-inverse">
+	        <div class="container">
+	            <div class="navbar-header" data-url="@Url">
+					<a class="navbar-brand" href="#">Course Filter App</a>
+	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                </button>
+	            </div>
+	            <div class="navbar-collapse collapse">
+	                <ul class="nav navbar-nav">
+						<li><a href="#"></a></li>
+					</ul>
+	            </div>
+	        </div>
+	    </div>
+		<div class="container body-content" ng-controller="gradeController as gradeCtrl">
+			<section class="col-sm-6 col-md-6 filters">
+				<select class="form-control" name="sl-board" id="sl-board" ng-model="boardsCtrl.current" ng-change="boardsCtrl.setCurrentSubject(-1);gradeCtrl.setCurrent(-1)">
+					<option value="-1" disabled>SELECT BOARD</option>
+					<option value="{{board.id}}" ng-repeat="board in boardsCtrl.boards">{{board.name}}</option>
+				</select>
+			</section>
+			<section class="col-sm-6 col-md-6 filters">
+				<select class="form-control" name="sl-grade" id="sl-grade" ng-model="gradeCtrl.current" ng-disabled="boardsCtrl.current == -1" ng-change="boardsCtrl.setCurrentSubject(-1)">
+					<option value="-1" disabled>SELECT GRADE</option>
+					<option value="{{grade.id}}" ng-repeat="grade in gradeCtrl.getGrades(boardsCtrl.boards[boardsCtrl.current].grades)">{{grade.name}}</option>
+				</select>
+			</section>
+			<section class="col-md-12 clearfix">
+				<div class="panel panel-default" ng-controller="subjectController as subjectCtrl" ng-hide="gradeCtrl.current == -1">
+				  <div class="panel-heading"><span>{{boardsCtrl.boards[boardsCtrl.current].name}}</span><span> -> {{gradeCtrl.grades[gradeCtrl.current].name}}</span>
+					<span> -> {{subjectCtrl.subjects[boardsCtrl.currentSubject].name}}</span></div>
+				  <div class="panel-body">
+				   <p ng-hide="gradeCtrl.grades[gradeCtrl.current].subjects.length == 0 || boardsCtrl.currentSubject !== -1">Select the subject</p>
+				   <p ng-show="subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length">Links</p>
+				   <p ng-show="gradeCtrl.grades[gradeCtrl.current].subjects.length == 0 || subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length == 0">No Data</p>
+				  </div>
+				   <ul class="list-group" ng-hide="boardsCtrl.currentSubject !== -1">
+						<li class="list-group-item" ng-repeat="subject in subjectCtrl.getSubjects(gradeCtrl.grades[gradeCtrl.current].subjects)" ng-click="boardsCtrl.setCurrentSubject(subject.id)">
+							<a href="#">{{subject.name}}</a>
+						</li>
+					</ul>
+					<ul class="list-group" ng-show="boardsCtrl.currentSubject !== -1" ng-controller="resourceController as resCtrl">
+						<li class="list-group-item" ng-repeat="resource in resCtrl.getResources(subjectCtrl.subjects[boardsCtrl.currentSubject].resources)">
+							<!--<img src="{{resource.thumbnail}}" alt="thumb_{{resource.name}}">-->
+							<a href="{{resource.url}}" ng-class="{deadLink:!resource.active}">{{resource.name}}</a>
+						</li>
+					</ul>
+				</div>
+			</section>
+			<section class="col-md-12 clearfix filters" ng-controller="languageController as langCtrl">
+				<select class="form-control" name="language" id="language" ng-model="langCtrl.current" ng-change="">
+					<option value="en">English</option>
+					<option value="hi">Hindi</option>
+					<option value="gu">Gujarati</option>
+				</select>
+			</section>
+		</div>
+	</body>
+	<script type="text/javascript" src="scripts/app.js"></script>
+</html>

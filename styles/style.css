@@ -1,0 +1,23 @@
+.filters {
+	margin-bottom: 10px;
+}
+
+.filters > select {
+	cursor: pointer;
+}
+
+.deadLink {
+	color: purple;
+}
+
+.deadLink:hover {
+	text-decoration: none;
+}
+
+.panel-body > p {
+	margin-bottom: 0;
+}
+
+.clearfix {
+	clear: both;
+}
