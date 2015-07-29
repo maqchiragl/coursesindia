@@ -1,3 +1,11 @@
+body {
+	position: static !important;
+}
+
+body > .skiptranslate:first-child {
+    display: none;
+}
+
 .filters {
 	margin-bottom: 10px;
 }
@@ -20,4 +28,30 @@
 
 .clearfix {
 	clear: both;
+}
+
+footer {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    padding-top: 10px;
+    padding-left: 92px;
+    background-color: rgb(234, 234, 234);
+}
+
+footer > p {
+    float: left;
+    margin: 8px 0 10px 0;
+}
+
+#google_translate_element {
+    float: right;
+    margin: 0 10px 10px 0;
+}
+
+@media screen and (max-width: 755px) {
+    footer {
+        padding-left: 10px;
+    }
 }
