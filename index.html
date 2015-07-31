@@ -1,0 +1,124 @@
+<!DOCTYPE Html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<title>Courses India</title>
+		
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="styles/style.css">
+		
+		<script type="text/javascript">
+			//maintian state
+			if(typeof(Storage) !== "undefined") {
+				var urlParams = location.hash, stateVars;
+				localStorage.clear();
+					
+				if(urlParams) {					
+					stateVars = urlParams.slice(1).split('#');
+					localStorage.currentBoard = +stateVars[0];
+					localStorage.currentGrade = +stateVars[1];
+					localStorage.currentSubject = +stateVars[2];
+				}
+			}
+		</script>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	</head>
+	<body ng-app="course" ng-controller="boardController as boardsCtrl">
+		<div class="navbar navbar-inverse">
+	        <div class="container">
+	            <div class="navbar-header" data-url="@Url">
+					<a class="navbar-brand" href="#">Courses India</a>
+	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                    <span class="icon-bar"></span>
+	                </button>
+	            </div>
+	            <div class="navbar-collapse collapse">
+	                <ul class="nav navbar-nav">
+						<li><a href="#"></a></li>
+					</ul>
+	            </div>
+	        </div>
+	    </div>
+		<div class="container body-content" ng-controller="gradeController as gradeCtrl" id="main-content">
+			<section class="col-sm-6 col-md-6 filters">
+				<select class="form-control" name="sl-board" id="sl-board" ng-options='board.id as board.name for board in boardsCtrl.boards' ng-model="boardsCtrl.current" ng-change="boardsCtrl.setCurrentSubject(-1);gradeCtrl.setCurrent(-1)">
+					<option style="display:none" value="">SELECT BOARD</option>
+				</select>
+			</section>
+			<section class="col-sm-6 col-md-6 filters">
+				<select class="form-control" name="sl-grade" id="sl-grade" ng-options='grade.id as grade.name for grade in gradeCtrl.getGrades(boardsCtrl.boards[boardsCtrl.current].grades)' ng-model="gradeCtrl.current" ng-disabled="boardsCtrl.current == -1" ng-change="boardsCtrl.setCurrentSubject(-1)">
+					<option style="display:none" value="">SELECT GRADE</option>
+				</select>
+			</section>
+			<section class="col-md-12 clearfix">
+				<div class="panel panel-default" ng-controller="subjectController as subjectCtrl" ng-hide="gradeCtrl.current == -1">
+				  <div class="panel-heading">
+					  <ul class="nav-links">
+						  <li>
+							  <a href='#{{boardsCtrl.current}}#{{gradeCtrl.current}}' ng-click="boardsCtrl.setCurrentSubject(-1)">Subjects</a>
+						  </li>
+						  <li>
+							  <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+							  <a href='#{{boardsCtrl.current}}#{{gradeCtrl.current}}#{{boardsCtrl.currentSubject}}' ng-disabled="true">{{subjectCtrl.subjects[boardsCtrl.currentSubject].name}}</a>
+						  </li>
+					  </ul>
+				  </div>
+				  <div class="panel-body" ng-show="!subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length">
+				   <p ng-hide="gradeCtrl.grades[gradeCtrl.current].subjects.length == 0 || boardsCtrl.currentSubject !== -1">Select the subject</p>
+				   <p ng-show="gradeCtrl.grades[gradeCtrl.current].subjects.length == 0 || subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length == 0">No Data</p>
+				  </div>
+				   <ul class="list-group" ng-hide="boardsCtrl.currentSubject !== -1">
+						<li class="list-group-item" ng-repeat="subject in subjectCtrl.getSubjects(gradeCtrl.grades[gradeCtrl.current].subjects)" ng-click="boardsCtrl.setCurrentSubject(subject.id)">
+							<a href="#{{boardsCtrl.current}}#{{gradeCtrl.current}}#{{boardsCtrl.currentSubject}}">{{subject.name}}</a>
+						</li>
+					</ul>
+					<ul class="list-group" ng-show="boardsCtrl.currentSubject !== -1" ng-controller="resourceController as resCtrl">
+						<li class="list-group-item" ng-repeat="resource in resCtrl.getResources(subjectCtrl.subjects[boardsCtrl.currentSubject].resources)">
+							<a href="{{resource.url}}" target="_blank" ng-class="{deadLink:!resource.active}">{{resource.name}}</a>
+						</li>
+					</ul>
+				</div>
+			</section>
+		</div>
+	</body>
+	<footer>
+    	<p>Courses India</p>
+		<div id="google_translate_element"></div>
+    </footer>
+	<script type="text/javascript" src="scripts/app.js"></script>
+	<script type="text/javascript">
+		function googleTranslateElementInit() {
+		  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'bn,en,gu,hi,kn,ml,mr,pa,ta,te,ur,vi', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+		}
+		
+		$.ajax({
+		  type: "GET",
+		  url: "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit",
+		  dataType: "script",
+		  success: function(){
+			console.log('Google translate loaded');
+		  },
+		  error: function(xhr, error, exception){
+			console.log(xhr);
+		  }
+		});
+		
+		//remove labels added by angular on option tag for google translate to work
+		$('.filters option').attr('label', '');
+		
+		$('#sl-board').on('change', function() {
+			location.hash = $(this).val();
+		});
+		
+		$('#sl-grade').on('change', function() {
+			location.hash = $('#sl-board').val() + '#' + $(this).val();
+		});
+	</script>
+</html>
