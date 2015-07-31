@@ -110,7 +110,7 @@
 		resources = [
 			{
 				id:0,
-				name: 'NOUNS',
+				name: 'Nouns',
 				thumbnail: '',
 				url: 'http://www.edufind.com/english-grammar/nouns/',
 				type: 'text',
@@ -118,7 +118,7 @@
 			},
 			{
 				id:1,
-				name: 'VERBS',
+				name: 'Verbs',
 				thumbnail: '',
 				url: 'http://www.edufind.com/english-grammar/verbs/',
 				type: 'text',
@@ -169,16 +169,43 @@
 	var app = angular.module("course", []);
 	
 	app.controller("boardController", function() {
-		this.current = -1;
+		
+		//check if number
+		//check if 0
+		//check if valid value
+		//check if valid for current parent
+		//-1 if above is false
+		var currentBoard = -1,
+			currentSubject = -1;
+			
 		this.boards = boards;
-		this.currentSubject = -1;
 		this.setCurrentSubject = function(id) {
 			this.currentSubject = id;
 		};
+		
+		if(localStorage) {
+			if(localStorage.currentBoard) {
+				currentBoard = +localStorage.currentBoard;
+				if(!((currentBoard || 0 === currentBoard) && boards[currentBoard])) {
+					currentBoard = -1;
+				}
+			}
+			
+			if(localStorage.currentSubject) {
+				currentSubject = +localStorage.currentSubject;
+				if(!((currentSubject || 0 === currentSubject) && subjects[currentSubject])) {
+					currentSubject = -1;
+				}
+			}
+		}
+		
+		this.current = currentBoard;
+		this.currentSubject = currentSubject;
 	});
 	
 	app.controller("gradeController", function() {
-		this.current = -1;
+		var currentGrade = -1;
+		
 		this.grades = grades;
 		this.getGrades = function(grades) {
 			var ret = [];
@@ -189,16 +216,34 @@
 				}, this);
 			}
 			
+			removeLabels('grade');
+			
 			return ret;
 		};
+		
 		this.setCurrent = function(id) {
+			
+			removeLabels('board');
+			
 			this.current = id;
 		};
+		
+		if(localStorage) {
+			if(localStorage.currentGrade) {
+				currentGrade = +localStorage.currentGrade;
+				if(!((currentGrade || 0 === currentGrade) && grades[currentGrade])) {
+					currentGrade = -1;
+				}
+			}
+		}
+		
+		this.current = currentGrade;
 	});
 	
 	app.controller("subjectController", function() {
 		var self = this;
-		self.current = -1;
+		var currentSubject = -1;
+		
 		self.subjects = subjects;
 		
 		self.getSubjects = function(subjects) {
@@ -212,11 +257,21 @@
 			
 			return ret;
 		};
+		
+		if(localStorage) {
+			if(localStorage.currentSubject) {
+				currentSubject = +localStorage.currentSubject;
+				if(!((currentSubject || 0 === currentSubject) && subjects[currentSubject])) {
+					currentSubject = -1;
+				}
+			}
+		}
+		
+		self.current = currentSubject;
 	});
 	
 	app.controller("resourceController", function() {
 		var self = this;
-		
 		self.resources = resources;
 		
 		self.getResources = function(resources) {
@@ -233,13 +288,6 @@
 		}
 	});
 	
-	app.controller("languageController", function() {
-		this.current = "en";
-		this.translatePage = function() {
-			$.ajax({});
-		};
-	});
-	
 	function setUrlStatus(resource, index) {
 		console.log('inside');
 		$.ajax({
@@ -253,5 +301,11 @@
 				console.log(err);
 	        }
 	    });
+	}
+	
+	function removeLabels(filter) {
+		$('.filters > select#sl-' + filter).on('change', function(){
+		    $('.filters option').attr('label', '');
+		});
 	}
 })();

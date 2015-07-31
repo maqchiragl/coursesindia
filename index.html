@@ -4,10 +4,25 @@
 		<meta charset="utf-8" />
     	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		
-		<title>Admin Panel</title>
+		<title>Courses India</title>
 		
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link rel="stylesheet" href="styles/style.css">
+		
+		<script type="text/javascript">
+			//maintian state
+			if(typeof(Storage) !== "undefined") {
+				var urlParams = location.hash, stateVars;
+				localStorage.clear();
+					
+				if(urlParams) {					
+					stateVars = urlParams.slice(1).split('#');
+					localStorage.currentBoard = +stateVars[0];
+					localStorage.currentGrade = +stateVars[1];
+					localStorage.currentSubject = +stateVars[2];
+				}
+			}
+		</script>
 		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>	
@@ -17,7 +32,7 @@
 		<div class="navbar navbar-inverse">
 	        <div class="container">
 	            <div class="navbar-header" data-url="@Url">
-					<a class="navbar-brand" href="#">Course Filter App</a>
+					<a class="navbar-brand" href="#">Courses India</a>
 	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 	                    <span class="icon-bar"></span>
 	                    <span class="icon-bar"></span>
@@ -33,54 +48,52 @@
 	    </div>
 		<div class="container body-content" ng-controller="gradeController as gradeCtrl" id="main-content">
 			<section class="col-sm-6 col-md-6 filters">
-				<select class="form-control" name="sl-board" id="sl-board" ng-model="boardsCtrl.current" ng-change="boardsCtrl.setCurrentSubject(-1);gradeCtrl.setCurrent(-1)">
-					<option value="-1" disabled>SELECT BOARD</option>
-					<option value="{{board.id}}" ng-repeat="board in boardsCtrl.boards">{{board.name}}</option>
+				<select class="form-control" name="sl-board" id="sl-board" ng-options='board.id as board.name for board in boardsCtrl.boards' ng-model="boardsCtrl.current" ng-change="boardsCtrl.setCurrentSubject(-1);gradeCtrl.setCurrent(-1)">
+					<option style="display:none" value="">SELECT BOARD</option>
 				</select>
 			</section>
 			<section class="col-sm-6 col-md-6 filters">
-				<select class="form-control" name="sl-grade" id="sl-grade" ng-model="gradeCtrl.current" ng-disabled="boardsCtrl.current == -1" ng-change="boardsCtrl.setCurrentSubject(-1)">
-					<option value="-1" disabled>SELECT GRADE</option>
-					<option value="{{grade.id}}" ng-repeat="grade in gradeCtrl.getGrades(boardsCtrl.boards[boardsCtrl.current].grades)">{{grade.name}}</option>
+				<select class="form-control" name="sl-grade" id="sl-grade" ng-options='grade.id as grade.name for grade in gradeCtrl.getGrades(boardsCtrl.boards[boardsCtrl.current].grades)' ng-model="gradeCtrl.current" ng-disabled="boardsCtrl.current == -1" ng-change="boardsCtrl.setCurrentSubject(-1)">
+					<option style="display:none" value="">SELECT GRADE</option>
 				</select>
 			</section>
 			<section class="col-md-12 clearfix">
 				<div class="panel panel-default" ng-controller="subjectController as subjectCtrl" ng-hide="gradeCtrl.current == -1">
-				  <div class="panel-heading"><span>{{boardsCtrl.boards[boardsCtrl.current].name}}</span><span> -> {{gradeCtrl.grades[gradeCtrl.current].name}}</span>
-					<span> -> {{subjectCtrl.subjects[boardsCtrl.currentSubject].name}}</span></div>
-				  <div class="panel-body">
+				  <div class="panel-heading">
+					  <ul class="nav-links">
+						  <li>
+							  <a href='#{{boardsCtrl.current}}#{{gradeCtrl.current}}' ng-click="boardsCtrl.setCurrentSubject(-1)">Subjects</a>
+						  </li>
+						  <li>
+							  <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+							  <a href='#{{boardsCtrl.current}}#{{gradeCtrl.current}}#{{boardsCtrl.currentSubject}}' ng-disabled="true">{{subjectCtrl.subjects[boardsCtrl.currentSubject].name}}</a>
+						  </li>
+					  </ul>
+				  </div>
+				  <div class="panel-body" ng-show="!subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length">
 				   <p ng-hide="gradeCtrl.grades[gradeCtrl.current].subjects.length == 0 || boardsCtrl.currentSubject !== -1">Select the subject</p>
-				   <p ng-show="subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length">Links</p>
 				   <p ng-show="gradeCtrl.grades[gradeCtrl.current].subjects.length == 0 || subjectCtrl.subjects[boardsCtrl.currentSubject].resources.length == 0">No Data</p>
 				  </div>
 				   <ul class="list-group" ng-hide="boardsCtrl.currentSubject !== -1">
 						<li class="list-group-item" ng-repeat="subject in subjectCtrl.getSubjects(gradeCtrl.grades[gradeCtrl.current].subjects)" ng-click="boardsCtrl.setCurrentSubject(subject.id)">
-							<a href="#">{{subject.name}}</a>
+							<a href="#{{boardsCtrl.current}}#{{gradeCtrl.current}}#{{boardsCtrl.currentSubject}}">{{subject.name}}</a>
 						</li>
 					</ul>
 					<ul class="list-group" ng-show="boardsCtrl.currentSubject !== -1" ng-controller="resourceController as resCtrl">
 						<li class="list-group-item" ng-repeat="resource in resCtrl.getResources(subjectCtrl.subjects[boardsCtrl.currentSubject].resources)">
-							<a href="{{resource.url}}" ng-class="{deadLink:!resource.active}">{{resource.name}}</a>
+							<a href="{{resource.url}}" target="_blank" ng-class="{deadLink:!resource.active}">{{resource.name}}</a>
 						</li>
 					</ul>
 				</div>
 			</section>
-			<section class="col-md-12 clearfix filters" ng-controller="languageController as langCtrl">
-				<select class="form-control" name="language" id="language" ng-model="langCtrl.current" ng-change="">
-					<option value="en">English</option>
-					<option value="hi">Hindi</option>
-					<option value="gu">Gujarati</option>
-				</select>
-			</section>
 		</div>
 	</body>
 	<footer>
-    	<p>&copy; 2015 - CoursesIndia</p>
+    	<p>Courses India</p>
 		<div id="google_translate_element"></div>
     </footer>
 	<script type="text/javascript" src="scripts/app.js"></script>
 	<script type="text/javascript">
-		$('#main-content').addClass('hidden');
 		function googleTranslateElementInit() {
 		  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'bn,en,gu,hi,kn,ml,mr,pa,ta,te,ur,vi', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
 		}
@@ -90,11 +103,22 @@
 		  url: "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit",
 		  dataType: "script",
 		  success: function(){
-			$('#main-content').removeClass('hidden');
+			console.log('Google translate loaded');
 		  },
 		  error: function(xhr, error, exception){
-			$('#main-content').removeClass('hidden');
+			console.log(xhr);
 		  }
+		});
+		
+		//remove labels added by angular on option tag for google translate to work
+		$('.filters option').attr('label', '');
+		
+		$('#sl-board').on('change', function() {
+			location.hash = $(this).val();
+		});
+		
+		$('#sl-grade').on('change', function() {
+			location.hash = $('#sl-board').val() + '#' + $(this).val();
 		});
 	</script>
 </html>
