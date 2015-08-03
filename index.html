@@ -91,11 +91,12 @@
 	<footer>
     	<p>Courses India</p>
 		<div id="google_translate_element"></div>
+        
     </footer>
 	<script type="text/javascript" src="scripts/app.js"></script>
 	<script type="text/javascript">
 		function googleTranslateElementInit() {
-		  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'bn,en,gu,hi,kn,ml,mr,pa,ta,te,ur,vi', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+		  new google.translate.TranslateElement({pageLanguage: 'en', includedLanguages: 'bn,en,gu,hi,kn,ml,mr,pa,ta,te,ur', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
 		}
 		
 		$.ajax({
@@ -121,4 +122,5 @@
 			location.hash = $('#sl-board').val() + '#' + $(this).val();
 		});
 	</script>
+	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </html>
